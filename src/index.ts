@@ -13,6 +13,7 @@ import { cors } from "hono/cors";
 import { secureHeaders } from "hono/secure-headers";
 import { timeout } from "hono/timeout";
 import { rateLimiter } from "hono-rate-limiter";
+import { collectDefaultMetrics, Counter, Histogram, Gauge, Registry } from "prom-client";
 
 // Helper for optional URL that treats empty string as undefined
 const optionalUrl = z
@@ -73,6 +74,30 @@ const otelSDK = new NodeSDK({
   traceExporter: new OTLPTraceExporter(),
 });
 otelSDK.start();
+
+// Prometheus metrics setup
+const register = new Registry();
+collectDefaultMetrics({ register });
+
+const httpRequestsTotal = new Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "status"],
+  registers: [register],
+});
+
+const downloadDuration = new Histogram({
+  name: "download_duration_seconds",
+  help: "Duration of download operations in seconds",
+  labelNames: ["status"],
+  registers: [register],
+});
+
+const activeDownloads = new Gauge({
+  name: "active_downloads",
+  help: "Number of currently active downloads",
+  registers: [register],
+});
 
 const app = new OpenAPIHono();
 
@@ -571,6 +596,7 @@ const downloadStartRoute = createRoute({
 app.openapi(downloadStartRoute, async (c) => {
   const { file_id } = c.req.valid("json");
   const startTime = Date.now();
+  activeDownloads.inc();
 
   // Get random delay and log it
   const delayMs = getRandomDelay();
@@ -617,6 +643,12 @@ app.openapi(downloadStartRoute, async (c) => {
       200,
     );
   }
+});
+
+// Prometheus metrics endpoint
+app.get("/metrics", async (c) => {
+  c.header("Content-Type", register.contentType);
+  return c.text(await register.metrics());
 });
 
 // OpenAPI spec endpoint (disabled in production)
