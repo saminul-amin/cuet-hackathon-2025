@@ -5,6 +5,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
 ## General Endpoints
 
 ### 1. Root Endpoint
+
 - **Method:** `GET`
 - **Path:** `/`
 - **Description:** Returns a welcome message to verify the API is reachable.
@@ -17,6 +18,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
   ```
 
 ### 2. Health Check
+
 - **Method:** `GET`
 - **Path:** `/health`
 - **Description:** Checks the health status of the service and its dependencies (e.g., S3).
@@ -32,6 +34,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
   ```
 
 ### 3. Metrics
+
 - **Method:** `GET`
 - **Path:** `/metrics`
 - **Description:** Exposes Prometheus metrics for monitoring system performance.
@@ -43,6 +46,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
 ## Download Endpoints
 
 ### 4. Initiate Download Job
+
 - **Method:** `POST`
 - **Path:** `/v1/download/initiate`
 - **Description:** Initiates a batch download job for multiple file IDs.
@@ -52,7 +56,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
     "file_ids": [10000, 10001, 10005]
   }
   ```
-  *Constraints:* `file_ids` must be an array of integers between 10,000 and 100,000,000.
+  _Constraints:_ `file_ids` must be an array of integers between 10,000 and 100,000,000.
 - **Response (200 OK):**
   ```json
   {
@@ -63,6 +67,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
   ```
 
 ### 5. Check Download Availability
+
 - **Method:** `POST`
 - **Path:** `/v1/download/check`
 - **Description:** Checks if a specific file ID is available for download in S3.
@@ -83,6 +88,7 @@ This document provides a summary of the backend API endpoints for the Delineate 
   ```
 
 ### 6. Start Download (Long Polling Simulation)
+
 - **Method:** `POST`
 - **Path:** `/v1/download/start`
 - **Description:** Starts a file download process. This endpoint simulates a long-running operation with a random delay (configurabe via env vars) to test timeout handling.
@@ -120,11 +126,13 @@ This document provides a summary of the backend API endpoints for the Delineate 
 ## Documentation Endpoints (Development Only)
 
 ### 7. OpenAPI Specification
+
 - **Method:** `GET`
 - **Path:** `/openapi`
 - **Description:** Returns the raw OpenAPI 3.0.0 specification JSON.
 
 ### 8. API Reference UI
+
 - **Method:** `GET`
 - **Path:** `/docs`
 - **Description:** Interactive API documentation using Scalar.
