@@ -149,5 +149,5 @@ jobs:
           description: |
             Build: ${{ needs.build.result }}
             Deploy: ${{ needs.deploy.result }}
-          color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
+          # color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
           username: GitHub Actions
