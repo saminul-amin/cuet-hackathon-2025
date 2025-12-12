@@ -60,7 +60,7 @@ jobs:
         run: npm run test:e2e
         env:
           NODE_ENV: development
-          PORT: 3000
+          PORT: 4001
           S3_REGION: us-east-1
           S3_ENDPOINT: http://localhost:9000
           S3_ACCESS_KEY_ID: minioadmin
@@ -149,5 +149,5 @@ jobs:
           description: |
             Build: ${{ needs.build.result }}
             Deploy: ${{ needs.deploy.result }}
-          color: ${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}
+          color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
           username: GitHub Actions

@@ -5,4 +5,4 @@ scrape_configs:
   - job_name: 'delineate-api'
     metrics_path: '/metrics'
     static_configs:
-      - targets: ['delineate-app:3000']
+      - targets: ['delineate-app:4001']
