@@ -133,10 +133,14 @@ app.use(
 );
 
 // Prometheus Metrics
-import { register, Counter, Histogram } from "prom-client";
+import {
+  register,
+  Counter,
+  Histogram,
+  collectDefaultMetrics as initDefaultMetrics,
+} from "prom-client";
 
 // Collect default metrics (cpu, memory, event loop, etc.)
-import { collectDefaultMetrics as initDefaultMetrics } from "prom-client";
 initDefaultMetrics();
 
 const httpRequestDurationMicroseconds = new Histogram({
