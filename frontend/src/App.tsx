@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { SentryTest } from "./components/SentryTest";
 import { StatsCard } from "./components/StatsCard";
 import { Activity, Download, HardDrive, RefreshCw } from "lucide-react";
-import { api, HealthStatus } from "./lib/api";
+import { api, type HealthStatus } from "./lib/api";
 import { motion } from "framer-motion";
 
 function App() {

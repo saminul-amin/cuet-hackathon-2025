@@ -534,8 +534,11 @@ This project uses **GitHub Actions** for Continuous Integration and Continuous D
 
 ### Pipeline Stages
 1. **Lint**: Runs ESLint to ensure code quality.
-2. **Test**: Runs E2E tests (`npm run test:e2e`) against a live API server and MinIO instance.
-3. **Build**: Builds the production Docker image.
+2. **Security**: Runs **CodeQL** analysis to detect vulnerabilities.
+3. **Test**: Runs E2E tests (`npm run test:e2e`) against a live API server and MinIO instance.
+4. **Build**: Builds and Pushes (if secrets present) the production Docker image to Docker Hub.
+5. **Deploy**: Trigger deployment to cloud provider (placeholder).
+6. **Notify**: Sends build status to **Discord**.
 
 ### For Contributors
 - **Pre-commit**: Please run `npm run lint` and `npm run format` locally.

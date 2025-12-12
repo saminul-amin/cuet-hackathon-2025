@@ -11,8 +11,20 @@ We have created a `.env` file for you based on `.env.example`.
 The CI/CD pipeline is ready. To enable Docker Hub pushing (optional) or other integrations, go to your GitHub Repo -> Settings -> Secrets and Variables -> Actions:
 - `DOCKERHUB_USERNAME`: Your Docker Hub username.
 - `DOCKERHUB_TOKEN`: Your Docker Hub Access Token.
+- `DISCORD_WEBHOOK`: (Optional) Webhook URL for Discord notifications.
 
-(Note: The current `ci.yml` has `push: false` for the build step. Change it to `true` if you want to push images.)
+### Enabling Bonus Features
+1.  **CodeQL Security**: Enabled automatically. Check the "Security" tab in your repo after a push.
+2.  **Branch Protection Rules**:
+    - Go to Settings -> Branches -> Add branch protection rule.
+    - Pattern: `main` or `master`.
+    - Check "Require status checks to pass before merging".
+    - Status checks: `Lint`, `E2E Tests`, `Security Scan (CodeQL)`.
+    - Check "Require a pull request before merging".
+3.  **Automatic Deployment**:
+    - The `deploy` job is set up as a placeholder.
+    - If you use **Render/Railway**, get their "Deploy Webhook URL" and add it as a secret (e.g., `RENDER_DEPLOY_HOOK`).
+    - Edit `.github/workflows/ci.yml` line 123 (approx) to uncomment the curl command using your new secret.
 
 ## 3. Running the System
 We added a new comprehensive Docker environment including the Frontend Dashboard.
@@ -26,6 +38,12 @@ npm run docker:dev
 - **Backend API**: http://localhost:3000
 - **Jaeger UI**: http://localhost:16686
 - **MinIO Console**: http://localhost:9001 (User/Pass: minioadmin)
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3001 (User: admin, Pass: admin)
+
+## Troubleshooting
+- **Backend Error**: If you saw `'DOWNLOAD_DELAY_MIN_MS' is not recognized`, run `npm install` again to get the fix, then `npm run dev` will work.
+- **Docker Container Status**: It is **normal** for `createbuckets-1` to show as "Exited (0)". This is an initialization container that runs once to create the S3 buckets and then stops. As long as `minio-1` is running, your storage is fine.
 
 ## 4. Architecture Design
 Review `ARCHITECTURE.md` for the proposed solution to the long-running download problem.
