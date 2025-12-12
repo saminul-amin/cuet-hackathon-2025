@@ -1,31 +1,32 @@
-import {
-  ConsoleSpanExporter,
-  SimpleSpanProcessor,
+import { 
+  SimpleSpanProcessor, 
+  ConsoleSpanExporter 
 } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
-import { resourceFromAttributes } from "@opentelemetry/resources";
-import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
+import { Resource } from "@opentelemetry/resources";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
 
 export const initInstrumentation = () => {
   const provider = new WebTracerProvider({
-    resource: resourceFromAttributes({
-      [SEMRESATTRS_SERVICE_NAME]: "delineate-frontend",
+    resource: new Resource({
+      "service.name": "delineate-frontend",
     }),
   });
 
-  const collectorOptions = {
-    url: "http://localhost:4318/v1/traces", 
-  };
-  
-  const exporter = new OTLPTraceExporter(collectorOptions);
-  
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  const exporter = new OTLPTraceExporter({
+    // Ensure this URL is correct for your local setup
+    url: "http://localhost:4318/v1/traces",
+  });
 
-  provider.register();
+  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
+  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+
+  provider.register({
+    contextManager: new ZoneContextManager(),
+  });
 
   registerInstrumentations({
     instrumentations: [
@@ -36,5 +37,5 @@ export const initInstrumentation = () => {
     ],
   });
 
-  console.log("Observability initialized");
+  console.log("Observability initialized successfully");
 };

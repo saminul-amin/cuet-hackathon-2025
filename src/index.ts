@@ -26,7 +26,7 @@ const EnvSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
   S3_REGION: z.string().min(1).default("us-east-1"),
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
@@ -131,6 +131,44 @@ app.use(
     dsn: env.SENTRY_DSN,
   }),
 );
+
+// Prometheus Metrics
+import { register, Counter, Histogram } from "prom-client";
+
+// Collect default metrics (cpu, memory, event loop, etc.)
+import { collectDefaultMetrics as initDefaultMetrics } from "prom-client";
+initDefaultMetrics();
+
+const httpRequestDurationMicroseconds = new Histogram({
+  name: "http_request_duration_ms",
+  help: "Duration of HTTP requests in ms",
+  labelNames: ["method", "route", "code"],
+  buckets: [50, 100, 200, 300, 400, 500, 750, 1000, 2000, 5000],
+});
+
+const httpRequestsTotal = new Counter({
+  name: "http_requests_total",
+  help: "Total number of HTTP requests",
+  labelNames: ["method", "route", "code"],
+});
+
+app.use(async (c, next) => {
+  const start = Date.now();
+  await next();
+  const duration = Date.now() - start;
+  const route = c.req.path; // simplified path for cardinality safety? ideally use route pattern
+  const method = c.req.method;
+  const status = c.res.status.toString();
+
+  httpRequestDurationMicroseconds.observe({ method, route, code: status }, duration);
+  httpRequestsTotal.inc({ method, route, code: status });
+});
+
+app.get("/metrics", async (c) => {
+  c.header("Content-Type", register.contentType);
+  return c.body(await register.metrics());
+});
+
 
 // Error response schema for OpenAPI
 const ErrorResponseSchema = z
@@ -628,7 +666,7 @@ if (env.NODE_ENV !== "production") {
       version: "1.0.0",
       description: "API for Delineate Hackathon Challenge",
     },
-    servers: [{ url: "http://localhost:3000", description: "Local server" }],
+    servers: [{ url: "http://localhost:3001", description: "Local server" }],
   });
 
   // Scalar API docs
