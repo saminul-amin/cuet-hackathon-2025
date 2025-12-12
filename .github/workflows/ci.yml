@@ -134,20 +134,20 @@ jobs:
         # Example for Render:
         # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-  notify:
-    name: Discord Notification
-    runs-on: ubuntu-24.04
-    needs: [build, deploy]
-    if: always()
-    steps:
-      - name: Build Notification
-        uses: sarisia/actions-status-discord@v1
-        if: always() && secrets.DISCORD_WEBHOOK != ''
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Build Status"
-          description: |
-            Build: ${{ needs.build.result }}
-            Deploy: ${{ needs.deploy.result }}
-          # color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
-          username: GitHub Actions
+  # notify:
+  #   name: Discord Notification
+  #   runs-on: ubuntu-24.04
+  #   needs: [build, deploy]
+  #   if: always()
+  #   steps:
+  #     - name: Build Notification
+  #       uses: sarisia/actions-status-discord@v1
+  #       if: always() && secrets.DISCORD_WEBHOOK != ''
+  #       with:
+  #         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+  #         title: "Build Status"
+  #         description: |
+  #           Build: ${{ needs.build.result }}
+  #           Deploy: ${{ needs.deploy.result }}
+  #         # color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
+  #         username: GitHub Actions
