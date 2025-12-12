@@ -1,6 +1,6 @@
 import ky from "ky";
 
-const API_Base = "http://localhost:4001";
+const API_Base = "http://localhost:3000";
 
 export const api = ky.create({
   prefixUrl: API_Base,

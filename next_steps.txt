@@ -35,7 +35,7 @@ npm run docker:dev
 ```
 
 - **Frontend Dashboard**: http://localhost:5173
-- **Backend API**: http://localhost:4001
+- **Backend API**: http://localhost:3000
 - **Jaeger UI**: http://localhost:16686
 - **MinIO Console**: http://localhost:9001 (User/Pass: minioadmin)
 - **Prometheus**: http://localhost:9090

@@ -6,7 +6,7 @@ services:
       context: ..
       dockerfile: docker/Dockerfile.dev
     ports:
-      - "4001:4001"
+      - "3000:3000"
     volumes:
       - ../src:/app/src
       - ../.env:/app/.env
