@@ -1,18 +1,5 @@
 # Delineate Hackathon Challenge - CUET Fest 2025
 
-## ✅ Project Completion Status
-
-This project successfully implements a production-ready microservices architecture with full observability, CI/CD, and S3 storage integration.
-
-| Challenge                            | Status       | Points   |
-| ------------------------------------ | ------------ | -------- |
-| Challenge 1: S3 Storage Integration  | ✅ Complete  | 15/15    |
-| Challenge 2: Architecture Design     | ✅ Complete  | 15/15    |
-| Challenge 3: CI/CD Pipeline          | ✅ Complete  | 10/10    |
-| Challenge 4: Observability Dashboard | ✅ Complete  | 10/10    |
-| **Total Score**                      | **✅ 50/50** | **100%** |
-
----
 
 ## 🏗️ System Architecture
 
