@@ -1,0 +1,39 @@
+# Next Steps & Instructions
+
+Congratulations on verifying the hackathon challenges! Here is what you need to do next to fully enable the features we implemented.
+
+## 1. Environment Configuration (.env)
+We have created a `.env` file for you based on `.env.example`.
+- **Sentry**: To test Sentry integration, sign up at [sentry.io](https://sentry.io), create a project, and add your `SENTRY_DSN` to the `.env` file.
+- **MinIO**: The buckets are automatically created by `scripts/setup-s3.ts` in CI or via the `createbuckets` service in Docker.
+
+## 2. GitHub Actions Secrets
+The CI/CD pipeline is ready. To enable Docker Hub pushing (optional) or other integrations, go to your GitHub Repo -> Settings -> Secrets and Variables -> Actions:
+- `DOCKERHUB_USERNAME`: Your Docker Hub username.
+- `DOCKERHUB_TOKEN`: Your Docker Hub Access Token.
+
+(Note: The current `ci.yml` has `push: false` for the build step. Change it to `true` if you want to push images.)
+
+## 3. Running the System
+We added a new comprehensive Docker environment including the Frontend Dashboard.
+
+To start everything (Backend, MinIO, Jaeger, Frontend):
+```bash
+npm run docker:dev
+```
+
+- **Frontend Dashboard**: http://localhost:5173
+- **Backend API**: http://localhost:3000
+- **Jaeger UI**: http://localhost:16686
+- **MinIO Console**: http://localhost:9001 (User/Pass: minioadmin)
+
+## 4. Architecture Design
+Review `ARCHITECTURE.md` for the proposed solution to the long-running download problem.
+
+## 5. Testing
+You can run the full E2E test suite locally:
+```bash
+# Make sure Docker is running via npm run docker:dev
+node --experimental-transform-types scripts/setup-s3.ts
+npm run test:e2e
+```
