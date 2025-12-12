@@ -1,0 +1,194 @@
+{
+  "info": {
+    "name": "Delineate Hackathon Challenge API",
+    "description": "Postman collection for the Delineate Hackathon Challenge Backend API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "General",
+      "item": [
+        {
+          "name": "Root Endpoint",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/",
+              "host": ["{{baseUrl}}"],
+              "path": [""]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Metrics",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["metrics"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Download",
+      "item": [
+        {
+          "name": "Initiate Download",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_ids\": [10000, 10001]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/download/initiate",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "download", "initiate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Download Availability",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_id\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/download/check",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "download", "check"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Check Download Availability (Sentry Test)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_id\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/download/check?sentry_test=true",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "download", "check"],
+              "query": [
+                {
+                  "key": "sentry_test",
+                  "value": "true"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Start Download",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json",
+                "type": "text"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"file_id\": 10000\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/v1/download/start",
+              "host": ["{{baseUrl}}"],
+              "path": ["v1", "download", "start"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "Docs",
+      "item": [
+        {
+          "name": "OpenAPI Spec",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/openapi",
+              "host": ["{{baseUrl}}"],
+              "path": ["openapi"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Scalar Docs",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/docs",
+              "host": ["{{baseUrl}}"],
+              "path": ["docs"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:3000",
+      "type": "string"
+    }
+  ]
+}
