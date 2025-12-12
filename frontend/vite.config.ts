@@ -6,5 +6,12 @@ export default defineConfig({
   server: {
     host: "0.0.0.0",
     port: 5173,
+    proxy: {
+      "/v1/traces": {
+        target: "http://delineate-jaeger:4318",
+        changeOrigin: true,
+        secure: false,
+      },
+    },
   },
 });
