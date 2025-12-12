@@ -77,7 +77,7 @@ otelSDK.start();
 const app = new OpenAPIHono();
 
 // Request ID middleware - adds unique ID to each request
-app.use(async (c, next) => {
+app.use(async (c: any, next) => {
   const requestId = c.req.header("x-request-id") ?? crypto.randomUUID();
   c.set("requestId", requestId);
   c.header("x-request-id", requestId);
@@ -180,7 +180,7 @@ const ErrorResponseSchema = z
   .openapi("ErrorResponse");
 
 // Error handler with Sentry
-app.onError((err, c) => {
+app.onError((err, c: any) => {
   c.get("sentry").captureException(err);
   const requestId = c.get("requestId") as string | undefined;
   return c.json(
