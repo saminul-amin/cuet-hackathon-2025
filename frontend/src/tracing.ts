@@ -1,6 +1,6 @@
-import { 
-  SimpleSpanProcessor, 
-  ConsoleSpanExporter 
+import {
+  SimpleSpanProcessor,
+  ConsoleSpanExporter,
 } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";

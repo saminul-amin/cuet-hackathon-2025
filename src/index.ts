@@ -26,7 +26,7 @@ const EnvSchema = z.object({
   NODE_ENV: z
     .enum(["development", "production", "test"])
     .default("development"),
-  PORT: z.coerce.number().int().min(1).max(65535).default(3001),
+  PORT: z.coerce.number().int().min(1).max(65535).default(3000),
   S3_REGION: z.string().min(1).default("us-east-1"),
   S3_ACCESS_KEY_ID: z.string().optional(),
   S3_SECRET_ACCESS_KEY: z.string().optional(),
@@ -79,7 +79,7 @@ const app = new OpenAPIHono();
 // Request ID middleware - adds unique ID to each request
 app.use(async (c, next) => {
   const requestId = c.req.header("x-request-id") ?? crypto.randomUUID();
-  c.set("requestId", requestId);
+  c.set("requestId" as never, requestId as never);
   c.header("x-request-id", requestId);
   await next();
 });
@@ -133,10 +133,14 @@ app.use(
 );
 
 // Prometheus Metrics
-import { register, Counter, Histogram } from "prom-client";
+import {
+  register,
+  Counter,
+  Histogram,
+  collectDefaultMetrics as initDefaultMetrics,
+} from "prom-client";
 
 // Collect default metrics (cpu, memory, event loop, etc.)
-import { collectDefaultMetrics as initDefaultMetrics } from "prom-client";
 initDefaultMetrics();
 
 const httpRequestDurationMicroseconds = new Histogram({
@@ -160,7 +164,10 @@ app.use(async (c, next) => {
   const method = c.req.method;
   const status = c.res.status.toString();
 
-  httpRequestDurationMicroseconds.observe({ method, route, code: status }, duration);
+  httpRequestDurationMicroseconds.observe(
+    { method, route, code: status },
+    duration,
+  );
   httpRequestsTotal.inc({ method, route, code: status });
 });
 
@@ -168,7 +175,6 @@ app.get("/metrics", async (c) => {
   c.header("Content-Type", register.contentType);
   return c.body(await register.metrics());
 });
-
 
 // Error response schema for OpenAPI
 const ErrorResponseSchema = z
@@ -182,7 +188,7 @@ const ErrorResponseSchema = z
 // Error handler with Sentry
 app.onError((err, c) => {
   c.get("sentry").captureException(err);
-  const requestId = c.get("requestId") as string | undefined;
+  const requestId = c.get("requestId" as never) as string | undefined;
   return c.json(
     {
       error: "Internal Server Error",

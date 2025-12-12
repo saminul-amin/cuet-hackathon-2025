@@ -9,7 +9,7 @@ export function SentryTest() {
     setLoading(true);
     try {
       await api.post("v1/download/check?sentry_test=true", {
-        json: { file_id: 70000 }
+        json: { file_id: 70000 },
       });
     } catch (err) {
       console.log("Expected error triggered:", err);
@@ -44,7 +44,7 @@ export function SentryTest() {
         <AlertTriangle className="h-5 w-5" />
         <span className="font-medium">Throw Frontend Error</span>
       </button>
-      
+
       <p className="text-xs text-gray-500 text-center px-4">
         Clicking these will generate exceptions that show up in Sentry.
       </p>

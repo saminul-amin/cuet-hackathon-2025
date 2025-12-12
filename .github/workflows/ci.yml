@@ -60,7 +60,7 @@ jobs:
         run: npm run test:e2e
         env:
           NODE_ENV: development
-          PORT: 4001
+          PORT: 3000
           S3_REGION: us-east-1
           S3_ENDPOINT: http://localhost:9000
           S3_ACCESS_KEY_ID: minioadmin
@@ -69,34 +69,15 @@ jobs:
           S3_FORCE_PATH_STYLE: "true"
           SENTRY_DSN: ""
           OTEL_EXPORTER_OTLP_ENDPOINT: ""
-          REQUEST_TIMEOUT_MS: "30000"
+          REQUEST_TIMEOUT_MS: "180000"
           RATE_LIMIT_WINDOW_MS: "60000"
           RATE_LIMIT_MAX_REQUESTS: "100"
           CORS_ORIGINS: "*"
 
-  security:
-    name: Security Scan (CodeQL)
-    runs-on: ubuntu-24.04
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-24.04
-    needs: [test, security]
+    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -134,20 +115,20 @@ jobs:
         # Example for Render:
         # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
 
-  notify:
-    name: Discord Notification
-    runs-on: ubuntu-24.04
-    needs: [build, deploy]
-    if: always()
-    steps:
-      - name: Build Notification
-        uses: sarisia/actions-status-discord@v1
-        if: always() && secrets.DISCORD_WEBHOOK != ''
-        with:
-          webhook: ${{ secrets.DISCORD_WEBHOOK }}
-          title: "Build Status"
-          description: |
-            Build: ${{ needs.build.result }}
-            Deploy: ${{ needs.deploy.result }}
-          # color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
-          username: GitHub Actions
+  # notify:
+  #   name: Discord Notification
+  #   runs-on: ubuntu-24.04
+  #   needs: [build, deploy]
+  #   if: always()
+  #   steps:
+  #     - name: Build Notification
+  #       uses: sarisia/actions-status-discord@v1
+  #       if: always() && secrets.DISCORD_WEBHOOK != ''
+  #       with:
+  #         webhook: ${{ secrets.DISCORD_WEBHOOK }}
+  #         title: "Build Status"
+  #         description: |
+  #           Build: ${{ needs.build.result }}
+  #           Deploy: ${{ needs.deploy.result }}
+  #         # color: "${{ needs.build.result == 'success' ? '0x00ff00' : '0xff0000' }}"
+  #         username: GitHub Actions

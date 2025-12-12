@@ -530,9 +530,10 @@ npm run docker:prod  # Start with Docker (production)
 
 ![CI Status](https://github.com/Start-Ops/cuet-micro-ops-hackathon-2025/actions/workflows/ci.yml/badge.svg)
 
-This project uses **GitHub Actions** for Continuous Integration and Continuous Deployment. The pipeline is defined in `.github/workflows/ci.yml`.
+This project uses **GitHub Actions** for Continuous Integration. The main pipeline is in `.github/workflows/ci.yml`, and security scanning is in `.github/workflows/codeql.yml`.
 
 ### Pipeline Stages
+
 1. **Lint**: Runs ESLint to ensure code quality.
 2. **Security**: Runs **CodeQL** analysis to detect vulnerabilities.
 3. **Test**: Runs E2E tests (`npm run test:e2e`) against a live API server and MinIO instance.
@@ -541,6 +542,7 @@ This project uses **GitHub Actions** for Continuous Integration and Continuous D
 6. **Notify**: Sends build status to **Discord**.
 
 ### For Contributors
+
 - **Pre-commit**: Please run `npm run lint` and `npm run format` locally.
 - **Testing**: Run `npm run test:e2e` locally to verify changes. ensure you have Docker running (MinIO is required for tests).
   - Use `npm run docker:dev` to start services.
@@ -555,6 +557,7 @@ A React-based Observability Dashboard is available to monitor the system status,
 2.  **Jaeger UI**: Running at http://localhost:16686
 
 To report errors to Sentry from the dashboard:
+
 1.  Configure `SENTRY_DSN` in `.env`.
 2.  Use the "Trigger Backend Error" button in the dashboard.
 

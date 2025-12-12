@@ -36,7 +36,6 @@ function App() {
       </div>
 
       <div className="relative mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
-        
         {/* Header */}
         <header className="mb-12 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -51,15 +50,15 @@ function App() {
             </div>
           </div>
           <div className="flex gap-4">
-             <a 
-               href="http://localhost:16686" 
-               target="_blank" 
-               rel="noreferrer"
-               className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white/10 border border-white/10"
-             >
-               <Activity className="h-4 w-4" />
-               Opening Jaeger UI
-             </a>
+            <a
+              href="http://localhost:16686"
+              target="_blank"
+              rel="noreferrer"
+              className="flex items-center gap-2 rounded-lg bg-white/5 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-white/10 border border-white/10"
+            >
+              <Activity className="h-4 w-4" />
+              Opening Jaeger UI
+            </a>
           </div>
         </header>
 
@@ -97,27 +96,24 @@ function App() {
 
         {/* Dashboard Content */}
         <div className="grid gap-8 lg:grid-cols-3">
-          
           {/* Main Content Area */}
           <div className="lg:col-span-2 space-y-8">
-             <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-                <h2 className="text-xl font-semibold mb-6">Active Jobs</h2>
-                <div className="rounded-xl border border-white/5 bg-black/20 p-8 text-center text-gray-500">
-                  No active downloads
-                </div>
-             </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+              <h2 className="text-xl font-semibold mb-6">Active Jobs</h2>
+              <div className="rounded-xl border border-white/5 bg-black/20 p-8 text-center text-gray-500">
+                No active downloads
+              </div>
+            </div>
           </div>
 
           {/* Sidebar / Actions */}
           <div className="space-y-8">
-             <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
-                <h2 className="text-xl font-semibold mb-6">Actions</h2>
-                <SentryTest />
-             </div>
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl">
+              <h2 className="text-xl font-semibold mb-6">Actions</h2>
+              <SentryTest />
+            </div>
           </div>
-
         </div>
-
       </div>
     </div>
   );

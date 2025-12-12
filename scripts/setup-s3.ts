@@ -28,9 +28,7 @@ const main = async () => {
   try {
     // Check if bucket exists
     try {
-      await s3Client.send(
-        new HeadBucketCommand({ Bucket: S3_BUCKET_NAME })
-      );
+      await s3Client.send(new HeadBucketCommand({ Bucket: S3_BUCKET_NAME }));
       console.log(`Bucket ${S3_BUCKET_NAME} already exists.`);
       return;
     } catch (err: any) {
@@ -43,7 +41,7 @@ const main = async () => {
     await s3Client.send(
       new CreateBucketCommand({
         Bucket: S3_BUCKET_NAME,
-      })
+      }),
     );
     console.log(`Bucket ${S3_BUCKET_NAME} created successfully.`);
 
@@ -65,10 +63,9 @@ const main = async () => {
       new PutBucketPolicyCommand({
         Bucket: S3_BUCKET_NAME,
         Policy: JSON.stringify(policy),
-      })
+      }),
     );
     console.log("Bucket policy set to public read.");
-
   } catch (err) {
     console.error("Error setting up S3:", err);
     process.exit(1);
