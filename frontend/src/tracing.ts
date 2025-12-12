@@ -1,28 +1,31 @@
-import {
-  SimpleSpanProcessor,
-  ConsoleSpanExporter,
-} from "@opentelemetry/sdk-trace-base";
+import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { registerInstrumentations } from "@opentelemetry/instrumentation";
+import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-document-load";
+import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
+import { UserInteractionInstrumentation } from "@opentelemetry/instrumentation-user-interaction";
+import { XMLHttpRequestInstrumentation } from "@opentelemetry/instrumentation-xml-http-request";
+import { SimpleSpanProcessor } from "@opentelemetry/sdk-trace-base";
 import { WebTracerProvider } from "@opentelemetry/sdk-trace-web";
 import { OTLPTraceExporter } from "@opentelemetry/exporter-trace-otlp-http";
-import { registerInstrumentations } from "@opentelemetry/instrumentation";
-import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
 import { Resource } from "@opentelemetry/resources";
-import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { ATTR_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 
-export const initInstrumentation = () => {
+export function initInstrumentation() {
   const provider = new WebTracerProvider({
     resource: new Resource({
-      "service.name": "delineate-frontend",
+      [ATTR_SERVICE_NAME]: "delineate-frontend",
     }),
   });
 
+  // Export to Jaeger via OTLP (through the collector or directly if CORS allows)
+  // In this setup, we'll try to use the OTLP/HTTP exporter
   const exporter = new OTLPTraceExporter({
-    // Ensure this URL is correct for your local setup
-    url: "http://localhost:4318/v1/traces",
+    url: "http://localhost:14318/v1/traces", // Adjust if using a collector
   });
 
-  provider.addSpanProcessor(new SimpleSpanProcessor(exporter));
-  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter()));
+  // Use 'as any' to bypass the version mismatch between sdk-trace-base and sdk-trace-web
+  provider.addSpanProcessor(new SimpleSpanProcessor(exporter) as any);
+  // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter())); // For debugging
 
   provider.register({
     contextManager: new ZoneContextManager(),
@@ -30,12 +33,10 @@ export const initInstrumentation = () => {
 
   registerInstrumentations({
     instrumentations: [
-      new FetchInstrumentation({
-        propagateTraceHeaderCorsUrls: [/.+/g],
-        clearTimingResources: true,
-      }),
+      new DocumentLoadInstrumentation(),
+      new UserInteractionInstrumentation(),
+      new XMLHttpRequestInstrumentation(),
+      new FetchInstrumentation(),
     ],
   });
-
-  console.log("Observability initialized successfully");
-};
+}

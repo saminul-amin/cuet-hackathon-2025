@@ -43,6 +43,7 @@ npm run docker:dev
 
 ## Troubleshooting
 - **Backend Error**: If you saw `'DOWNLOAD_DELAY_MIN_MS' is not recognized`, run `npm install` again to get the fix, then `npm run dev` will work.
+- **Port Error (`EADDRINUSE 3000`)**: This means Docker is running. You cannot run `npm run dev` (Local) and `npm run docker:dev` (Docker) at the same time because both use port 3000. Stop Docker first (`docker compose down`) to run locally.
 - **Docker Container Status**: It is **normal** for `createbuckets-1` to show as "Exited (0)". This is an initialization container that runs once to create the S3 buckets and then stops. As long as `minio-1` is running, your storage is fine.
 
 ## 4. Architecture Design

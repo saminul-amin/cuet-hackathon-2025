@@ -1,4 +1,4 @@
-import { HeadObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { HeadObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { serve } from "@hono/node-server";
 import type { ServerType } from "@hono/node-server";
 import { httpInstrumentationMiddleware } from "@hono/otel";
@@ -89,6 +89,7 @@ app.use(secureHeaders());
 
 // CORS middleware
 app.use(
+  "*",
   cors({
     origin: env.CORS_ORIGINS,
     allowMethods: ["GET", "POST", "OPTIONS"],
@@ -156,6 +157,8 @@ const httpRequestsTotal = new Counter({
   labelNames: ["method", "route", "code"],
 });
 
+import { trace, context } from "@opentelemetry/api";
+
 app.use(async (c, next) => {
   const start = Date.now();
   await next();
@@ -169,6 +172,13 @@ app.use(async (c, next) => {
     duration,
   );
   httpRequestsTotal.inc({ method, route, code: status });
+
+  // Add correlation logging
+  const currentSpan = trace.getSpan(context.active());
+  if (currentSpan) {
+    const spanContext = currentSpan.spanContext();
+    console.log(`[Trace] Method=${method} Route=${route} Status=${status} TraceID=${spanContext.traceId} SpanID=${spanContext.spanId}`);
+  }
 });
 
 app.get("/metrics", async (c) => {
@@ -629,7 +639,31 @@ app.openapi(downloadStartRoute, async (c) => {
   await sleep(delayMs);
 
   // Check if file is available in S3
-  const s3Result = await checkS3Availability(file_id);
+  let s3Result = await checkS3Availability(file_id);
+
+  console.log(`[DEBUG] file_id=${file_id} available=${s3Result.available} bucket='${env.S3_BUCKET_NAME}'`);
+
+  // If not available, generate a dummy file (Simulating "Processing Result")
+  if (!s3Result.available && env.S3_BUCKET_NAME) {
+    try {
+      const s3Key = sanitizeS3Key(file_id);
+      const dummyContent = `This is a generated file for ID ${String(file_id)}\nTimestamp: ${new Date().toISOString()}`;
+      
+      await s3Client.send(new PutObjectCommand({
+        Bucket: env.S3_BUCKET_NAME,
+        Key: s3Key,
+        Body: dummyContent,
+        ContentType: "text/plain",
+      }));
+      
+      console.log(`[Download] Generated and uploaded file_id=${file_id} to S3 bucket=${env.S3_BUCKET_NAME}`);
+      
+      // Re-check availability
+      s3Result = await checkS3Availability(file_id);
+    } catch (err) {
+      console.error(`[Download] Failed to generate simulation file:`, err);
+    }
+  }
   const processingTimeMs = Date.now() - startTime;
 
   console.log(
