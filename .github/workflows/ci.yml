@@ -74,29 +74,10 @@ jobs:
           RATE_LIMIT_MAX_REQUESTS: "100"
           CORS_ORIGINS: "*"
 
-  security:
-    name: Security Scan (CodeQL)
-    runs-on: ubuntu-24.04
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: javascript
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
   build:
     name: Build & Push Docker Image
     runs-on: ubuntu-24.04
-    needs: [test, security]
+    needs: test
     steps:
       - name: Checkout
         uses: actions/checkout@v4

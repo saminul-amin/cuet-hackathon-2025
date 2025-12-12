@@ -530,7 +530,7 @@ npm run docker:prod  # Start with Docker (production)
 
 ![CI Status](https://github.com/Start-Ops/cuet-micro-ops-hackathon-2025/actions/workflows/ci.yml/badge.svg)
 
-This project uses **GitHub Actions** for Continuous Integration and Continuous Deployment. The pipeline is defined in `.github/workflows/ci.yml`.
+This project uses **GitHub Actions** for Continuous Integration. The main pipeline is in `.github/workflows/ci.yml`, and security scanning is in `.github/workflows/codeql.yml`.
 
 ### Pipeline Stages
 
