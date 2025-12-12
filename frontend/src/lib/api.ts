@@ -1,6 +1,6 @@
 import ky from "ky";
 
-const API_Base = "http://localhost:3000";
+const API_Base = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
 export const api = ky.create({
   prefixUrl: API_Base,

@@ -104,16 +104,74 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
 
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: docker/Dockerfile.web
+          push: ${{ github.event_name != 'pull_request' && secrets.DOCKERHUB_USERNAME != '' }}
+          tags: ${{ secrets.DOCKERHUB_USERNAME }}/delineate-web:latest,${{ secrets.DOCKERHUB_USERNAME }}/delineate-web:${{ github.sha }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
   deploy:
     name: Deploy to Cloud
     runs-on: ubuntu-24.04
     needs: build
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     steps:
-      - name: Deploy Trigger
-        run: echo "Deploying to production... (Configure your specific provider here, e.g., Render/Railway webhook)"
-        # Example for Render:
-        # run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Create deployment directory
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          script: mkdir -p ~/delineate
+
+      - name: Copy config files to VPS
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          source: "docker/compose.prod.yml"
+          target: "~/delineate"
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          DOCKERHUB_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          DOMAIN_NAME: ${{ secrets.DOMAIN_NAME }}
+          MINIO_ROOT_USER: ${{ secrets.MINIO_ROOT_USER }}
+          MINIO_ROOT_PASSWORD: ${{ secrets.MINIO_ROOT_PASSWORD }}
+          # Add other env vars here as secrets if needed
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_KEY }}
+          envs: DOCKERHUB_USERNAME,DOMAIN_NAME,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD
+          script: |
+            cd ~/delineate
+
+            # Create/Update .env file
+            echo "DOCKERHUB_USERNAME=$DOCKERHUB_USERNAME" > .env
+            echo "DOMAIN_NAME=$DOMAIN_NAME" >> .env
+            echo "MINIO_ROOT_USER=${MINIO_ROOT_USER:-minioadmin}" >> .env
+            echo "MINIO_ROOT_PASSWORD=${MINIO_ROOT_PASSWORD:-minioadmin}" >> .env
+
+            # Create certs directory if it doesn't exist
+            mkdir -p certs
+
+            # Pull and Restart
+            docker compose -f compose.prod.yml pull
+            docker compose -f compose.prod.yml down --remove-orphans
+            docker compose -f compose.prod.yml up -d
+
+            # Cleanup
+            docker image prune -f
 
   # notify:
   #   name: Discord Notification
