@@ -164,7 +164,10 @@ app.use(async (c, next) => {
   const method = c.req.method;
   const status = c.res.status.toString();
 
-  httpRequestDurationMicroseconds.observe({ method, route, code: status }, duration);
+  httpRequestDurationMicroseconds.observe(
+    { method, route, code: status },
+    duration,
+  );
   httpRequestsTotal.inc({ method, route, code: status });
 });
 
@@ -172,7 +175,6 @@ app.get("/metrics", async (c) => {
   c.header("Content-Type", register.contentType);
   return c.body(await register.metrics());
 });
-
 
 // Error response schema for OpenAPI
 const ErrorResponseSchema = z
