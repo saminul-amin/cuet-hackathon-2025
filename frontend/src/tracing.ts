@@ -1,4 +1,5 @@
 import { ZoneContextManager } from "@opentelemetry/context-zone";
+import { ConsoleSpanExporter } from "@opentelemetry/sdk-trace-base";
 import { registerInstrumentations } from "@opentelemetry/instrumentation";
 import { DocumentLoadInstrumentation } from "@opentelemetry/instrumentation-document-load";
 import { FetchInstrumentation } from "@opentelemetry/instrumentation-fetch";
@@ -20,12 +21,12 @@ export function initInstrumentation() {
   // Export to Jaeger via OTLP (through the collector or directly if CORS allows)
   // In this setup, we'll try to use the OTLP/HTTP exporter
   const exporter = new OTLPTraceExporter({
-    url: "http://localhost:14318/v1/traces", // Adjust if using a collector
+    url: "/v1/traces", // Proxy via Vite
   });
 
   // Use 'as any' to bypass the version mismatch between sdk-trace-base and sdk-trace-web
   provider.addSpanProcessor(new SimpleSpanProcessor(exporter) as any);
-  // provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter())); // For debugging
+  provider.addSpanProcessor(new SimpleSpanProcessor(new ConsoleSpanExporter())); // For debugging
 
   provider.register({
     contextManager: new ZoneContextManager(),
