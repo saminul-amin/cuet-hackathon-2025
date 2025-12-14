@@ -311,6 +311,17 @@ const DownloadStartResponseSchema = z
   })
   .openapi("DownloadStartResponse");
 
+// Upload API Schemas
+const UploadResponseSchema = z
+  .object({
+    filename: z.string(),
+    s3Key: z.string(),
+    size: z.number(),
+    message: z.string(),
+  })
+  .openapi("UploadResponse");
+
+
 // Input sanitization for S3 keys - prevent path traversal
 const sanitizeS3Key = (fileId: number): string => {
   // Ensure fileId is a valid integer within bounds (already validated by Zod)
@@ -627,6 +638,53 @@ const downloadStartRoute = createRoute({
   },
 });
 
+const uploadRoute = createRoute({
+  method: "post",
+  path: "/v1/upload",
+  tags: ["Upload"],
+  summary: "Upload a file",
+  description: "Uploads a file to S3/MinIO storage",
+  request: {
+    body: {
+      content: {
+        "multipart/form-data": {
+          schema: z.object({
+            file: z
+              .custom<File>((v) => v instanceof File || v instanceof Blob)
+              .openapi({ format: "binary", type: "string" }),
+          }),
+        },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Upload successful",
+      content: {
+        "application/json": {
+          schema: UploadResponseSchema,
+        },
+      },
+    },
+    400: {
+      description: "Invalid request",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+    500: {
+      description: "Internal server error",
+      content: {
+        "application/json": {
+          schema: ErrorResponseSchema,
+        },
+      },
+    },
+  },
+});
+
 app.openapi(downloadStartRoute, async (c) => {
   const { file_id } = c.req.valid("json");
   const startTime = Date.now();
@@ -704,6 +762,66 @@ app.openapi(downloadStartRoute, async (c) => {
         message: `File not found after ${(processingTimeMs / 1000).toFixed(1)} seconds of processing`,
       },
       200,
+    );
+  }
+});
+
+app.openapi(uploadRoute, async (c) => {
+  try {
+    const body = await c.req.parseBody();
+    const file = body.file;
+
+    if (!(file instanceof File) && !(file instanceof Blob)) {
+      return c.json(
+        {
+          error: "Bad Request",
+          message: "No file uploaded or invalid format",
+        },
+        400,
+      );
+    }
+
+    // Generate unique key
+    const fileName = (file as File).name || "uploaded-file";
+    const fileId = crypto.randomUUID();
+    const s3Key = `uploads/${fileId}-${fileName}`;
+
+    // Read content
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = new Uint8Array(arrayBuffer);
+
+    if (env.S3_BUCKET_NAME) {
+      await s3Client.send(
+        new PutObjectCommand({
+          Bucket: env.S3_BUCKET_NAME,
+          Key: s3Key,
+          Body: buffer,
+          ContentType: file.type || "application/octet-stream",
+        }),
+      );
+    } else {
+      console.log(
+        `[Upload] Mock upload: ${fileName} (${String(buffer.length)} bytes) to ${s3Key}`,
+      );
+    }
+
+    return c.json(
+      {
+        filename: fileName,
+        s3Key,
+        size: buffer.length,
+        message: "File uploaded successfully",
+      },
+      200,
+    );
+  } catch (err) {
+    console.error("[Upload] Error:", err);
+    return c.json(
+      {
+        error: "Internal Server Error",
+        message: err instanceof Error ? err.message : "Upload failed",
+      },
+      500,
     );
   }
 });

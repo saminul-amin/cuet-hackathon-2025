@@ -27,3 +27,7 @@ lerna-debug.log*
 # misc
 .DS_Store
 data/
+
+#md
+ARCHITECTURE.md
+README.md   
