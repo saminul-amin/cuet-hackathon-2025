@@ -769,7 +769,7 @@ app.openapi(downloadStartRoute, async (c) => {
 app.openapi(uploadRoute, async (c) => {
   try {
     const body = await c.req.parseBody();
-    const file = body["file"];
+    const file = body.file;
 
     if (!(file instanceof File) && !(file instanceof Blob)) {
       return c.json(
@@ -801,7 +801,7 @@ app.openapi(uploadRoute, async (c) => {
       );
     } else {
       console.log(
-        `[Upload] Mock upload: ${fileName} (${buffer.length} bytes) to ${s3Key}`,
+        `[Upload] Mock upload: ${fileName} (${String(buffer.length)} bytes) to ${s3Key}`,
       );
     }
 
