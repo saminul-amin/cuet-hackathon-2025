@@ -47,7 +47,7 @@ const MetricsPanel: FC<MetricsPanelProps> = ({ apiUrl }) => {
         <span className="status-badge processing">Live</span>
       </div>
 
-      <div className="metrics-grid">
+      {/* <div className="metrics-grid">
         <div className="metric-item">
           <div className="metric-label">Prometheus</div>
           <button
@@ -69,7 +69,7 @@ const MetricsPanel: FC<MetricsPanelProps> = ({ apiUrl }) => {
             Open Grafana
           </button>
         </div>
-      </div>
+      </div> */}
 
       <div
         style={{

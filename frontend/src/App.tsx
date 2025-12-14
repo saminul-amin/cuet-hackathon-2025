@@ -4,6 +4,7 @@ import DownloadJobs from "./components/DownloadJobs";
 import ErrorLog from "./components/ErrorLog";
 import MetricsPanel from "./components/MetricsPanel";
 import TraceViewer from "./components/TraceViewer";
+import UploadSection from "./components/UploadSection";
 
 const API_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
 
@@ -52,6 +53,10 @@ function App() {
             <div className="dashboard-grid">
               <DownloadJobs apiUrl={API_URL} />
               <ErrorLog apiUrl={API_URL} />
+            </div>
+
+            <div style={{ marginBottom: "1.5rem" }}>
+              <UploadSection apiUrl={API_URL} />
             </div>
 
             <TraceViewer />
